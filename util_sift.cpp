@@ -309,7 +309,7 @@ void UTIL_Sift::saveDescriptorsSiftPCADir(std::vector<std::string> &files,
     std::cout << "generate PCA-sift descriptors" << std::endl;
 
     //Generamos los sift de cada imagen, pryectamos PCA y grabamos un fichero paralelo con los sift
-    it_files = files.begin();
+    std::vector < std::string>::iterator it_files = files.begin();
     for (; it_files != files.end(); it_files++)
     {
         std::string file = *it_files;
