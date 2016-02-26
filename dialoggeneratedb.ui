@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DialogGenerateDB</class>
+ <widget class="QDialog" name="DialogGenerateDB">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>733</width>
+    <height>208</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QLineEdit" name="lEDesfase">
+   <property name="geometry">
+    <rect>
+     <x>550</x>
+     <y>132</y>
+     <width>40</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>25</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="cBOnlyVisualTraking">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>133</y>
+     <width>111</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>only visual</string>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="dirImgGenerate">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>62</y>
+     <width>701</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>/media/dortega/datos/WORKS/trackTrace/database/t1c1/faces</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="dirFileFilterId">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>104</y>
+     <width>701</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>/media/dortega/datos/WORKS/trackTrace/database/interesFaces.txt</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lPixelsExpand">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>132</y>
+     <width>41</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>30</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_9">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>5</y>
+     <width>111</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>video file</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="cBSeparateImgs">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>134</y>
+     <width>111</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>dir by ids</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>89</y>
+     <width>131</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>filter Faces id file</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>45</y>
+     <width>111</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Imgs output dir</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lMaxFilesOfClass">
+   <property name="geometry">
+    <rect>
+     <x>139</x>
+     <y>162</y>
+     <width>101</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>0</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lImgSize">
+   <property name="geometry">
+    <rect>
+     <x>439</x>
+     <y>132</y>
+     <width>40</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>100</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_10">
+   <property name="geometry">
+    <rect>
+     <x>378</x>
+     <y>137</y>
+     <width>60</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>img size</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="cBViolaVerify">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>134</y>
+     <width>111</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>viola verify</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lDesfase">
+   <property name="geometry">
+    <rect>
+     <x>489</x>
+     <y>138</y>
+     <width>60</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Desfase</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pBGenerateImages">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>161</y>
+     <width>171</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>generate Images</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="cBExpandImgs">
+   <property name="geometry">
+    <rect>
+     <x>122</x>
+     <y>134</y>
+     <width>81</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>expand</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_15">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>167</y>
+     <width>121</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>max files of class</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lvideoFileName">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>20</y>
+     <width>701</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>/media/dortega/datos/WORKS/trackTrace/database/t1c1/t1c1.avi</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
