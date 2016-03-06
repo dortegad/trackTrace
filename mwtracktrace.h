@@ -48,6 +48,8 @@ private:
 
     DialogGenerateDB *generateDB;
 
+    cv::PCA pca;
+
 public :
 
     //DICCTIONARY
@@ -87,9 +89,6 @@ public :
                               cv::Mat &labelMat,
                               cv::Mat &dataMat);
     void generateSVM();
-
-    void descriptorBowRegions(const std::string &fileName,
-                              cv::Mat &descBow);
 
     void descriptorBow(const std::string &fileName,
                        cv::Mat &descBow);

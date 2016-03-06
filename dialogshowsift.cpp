@@ -8,6 +8,14 @@
 
 #include <util_sift.h>
 
+#include <dirent.h>
+#include <sys/stat.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
+using namespace std;
+
 //------------------------------------------------------------------------------------------
 DialogShowSift::DialogShowSift(QWidget *parent) :
     QDialog(parent),
@@ -48,6 +56,7 @@ void DialogShowSift::generateSift()
     {
         float score = scores[i];
         float umbral = ui->lEThresholdSift->text().toFloat();
+        std::cout << score << " " << umbral << std::endl;
         if (score > umbral)
         {
             cv::KeyPoint kp = keyPoints[i];
@@ -105,7 +114,6 @@ void DialogShowSift::showSiftActualFile()
     float dif = max - min;
     paso = dif / 100;
 
-
     cv::cvtColor(img,this->imgSift,CV_GRAY2BGR);
 
     this->showSift();
@@ -125,7 +133,8 @@ void DialogShowSift::on_vSThresholdSift_sliderMoved(int position)
 {
     int value = ui->vSThresholdSift->value();
     th = value;
-    ui->lEThresholdSift->setText(QString::number((th*paso)+min));
+//    ui->lEThresholdSift->setText(QString::number((th*paso)+min));
+    ui->lEThresholdSift->setText(QString::number(th/100.0));
 
     generateSift();
 }
@@ -135,7 +144,8 @@ void DialogShowSift::on_lEThresholdSift_editingFinished()
 {
     th = ui->lEThresholdSift->text().toFloat();
 
-    ui->vSThresholdSift->setValue((th/paso)+min);
+//    ui->vSThresholdSift->setValue((th/paso)+min);
+    ui->vSThresholdSift->setValue(th*100.0);
 
     generateSift();
     this->show();

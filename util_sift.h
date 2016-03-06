@@ -6,6 +6,23 @@
 
 class UTIL_Sift
 {
+private:
+    static void sifts(const cv::Mat &img,
+               int keyPointSize,
+               int density,
+               bool rSift,
+               bool filterDescriptors,
+               float thresholdFilter,
+               cv::Mat &descriptors,
+               std::vector<cv::KeyPoint> &keyPoints);
+    static void siftsRegions(const cv::Mat &img,
+                      int keyPointSize,
+                      int density,
+                      bool rSift,
+                      bool filterDescriptors,
+                      float thresholdFilter,
+                      cv::Mat &descriptors,
+                      std::vector<cv::KeyPoint> &keyPoints);
 public:
     static void createKeyPoints(const cv::Mat &img,
                                 int keyPointSize,
@@ -23,6 +40,7 @@ public:
                                std::vector<cv::KeyPoint> &keyPoints,
                                cv::Mat &descriptors);
     static void filterDescriptorsSift(cv::Mat &descriptors,
+                                      std::vector<cv::KeyPoint> &keyPoints,
                                       float threshold);
     static void computeAndDetectSift(const cv::Mat &img,
                                      std::vector<cv::KeyPoint> &keyPoints,
@@ -30,31 +48,16 @@ public:
                                      std::vector<float> &scores);
     static void scoresDescriptorsSift(cv::Mat &descriptors,
                                       std::vector<float> &scores);
-    static void sifts(const cv::Mat &img,
-                      int keyPointSize,
-                      int density,
-                      bool rSift,
-                      bool filterDescriptors,
-                      float thresholdFilter,
-                      cv::Mat &descriptors,
-                      std::vector<cv::KeyPoint> &keyPoints);
 
-    static void sifts(std::vector<std::string> &files,
-                      int keyPointSize,
-                      int density,
-                      bool rSift,
-                      bool filterDescriptors,
-                      float thresholdFilter,
-                      cv::Mat &descriptors);
-
-    static void siftsRegions(const cv::Mat &img,
-                             int keyPointSize,
-                             int density,
-                             bool rSift,
-                             bool filterDescriptors,
-                             float thresholdFilter,
-                             cv::Mat &descriptors,
-                             std::vector<cv::KeyPoint> &keyPoints);
+    static void descriptorsSift(const cv::Mat &img,
+                          int keyPointSize,
+                          int density,
+                          bool rSift,
+                          bool filterDescriptors,
+                          float thresholdFilter,
+                          bool region,
+                          cv::Mat &descriptors,
+                          std::vector < cv::KeyPoint > &keyPoints);
 
     static void rootSift(cv::Mat &descriptors);
 
@@ -63,6 +66,7 @@ public:
                                        int density,
                                        bool rSift,
                                        bool filterDescriptors,
+                                       bool region,
                                        float thresholdFilter);
 
     static void saveDescriptorsSiftPCADir(std::vector<std::string> &files,
@@ -70,7 +74,9 @@ public:
                                           int density,
                                           bool rSift,
                                           bool filterDescriptors,
-                                          float thresholdFilter);
+                                          float thresholdFilter,
+                                          bool region,
+                                          cv::PCA &pca);
 
 
 };

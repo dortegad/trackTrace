@@ -520,7 +520,7 @@ void MWTrackTrace::generatePCA(cv::Mat &labelMat,
                                cv::Mat &dataMat)
 {
     int num_components = 3;
-    cv::PCA pca(dataMat, cv::Mat(), CV_PCA_DATA_AS_ROW, num_components);
+    cv::PCA pcaResult(dataMat, cv::Mat(), CV_PCA_DATA_AS_ROW, num_components);
 
     //Nos recorremos todas las filas de la matric calculando su pca
     std::stringstream pcaFileName;
@@ -532,7 +532,7 @@ void MWTrackTrace::generatePCA(cv::Mat &labelMat,
     {
         cv::Mat row = dataMat.row(i);
         cv::Mat pcaData;
-        pca.project(row, pcaData);
+        pcaResult.project(row, pcaData);
         std::stringstream pcaValues;
         pcaValues << pcaData.at<float>(0,0) << ","
                   << pcaData.at<float>(0,1) << ","
@@ -612,57 +612,43 @@ void MWTrackTrace::on_pBGenerateSVM_clicked()
     generateSVM();
 }
 
-
-//-------------------------------------------------------------------------------------------------------------
-void MWTrackTrace::descriptorBowRegions(const std::string &fileName,
-                                        cv::Mat &descBow)
-{
-    //Generamos los sift de toda la imagen
-    cv::Mat img = cv::imread(fileName);
-    cv::Mat sifts;
-//    UTIL_Sift::siftsRegions(img,
-//                            ui->lkpSize->text().toInt(),
-//                            ui->lkpDensity->text().toInt(),
-//                            ui->cBRootSift->isChecked(),
-//                            ui->cBFilterSift->isChecked(),
-//                            ui->lthresholdFilterSift->text().toFloat(),
-//                            descriptors);
-    img.release();
-
-    //Generamos la traduccionBow de cada imagen
-    std::vector< std::vector< int > > pointIdxsOfClusters;
-    this->bow->compute(sifts,
-                       descBow,
-                       &pointIdxsOfClusters);
-
-    std::cout << "generate descriptor bow-regions from " << fileName << std::endl;
-}
-
 //-------------------------------------------------------------------------------------------------------------
 void MWTrackTrace::descriptorBow(const std::string &fileName,
                                  cv::Mat &descBow)
 {
-    cv::Mat img = cv::imread(fileName);
+//    if (ui->cBRegionsBow->isChecked())
+//        descriptorBowRegions(fileName,descBow);
+//    else
+    {
+        cv::Mat img = cv::imread(fileName);
 
-    cv::Mat descriptors;
-    std::vector <cv::KeyPoint> keyPoints;
-    UTIL_Sift::sifts(img,
-                     ui->lkpSize->text().toInt(),
-                     ui->lkpDensity->text().toInt(),
-                     ui->cBRootSift->isChecked(),
-                     ui->cBFilterSift->isChecked(),
-                     ui->lthresholdFilterSift->text().toFloat(),
-                     descriptors,
-                     keyPoints);
+        cv::Mat descriptors;
+        std::vector <cv::KeyPoint> keyPoints;
+        UTIL_Sift::descriptorsSift(img,
+                                   ui->lkpSize->text().toInt(),
+                                   ui->lkpDensity->text().toInt(),
+                                   ui->cBRootSift->isChecked(),
+                                   ui->cBFilterSift->isChecked(),
+                                   ui->lthresholdFilterSift->text().toFloat(),
+                                   ui->cBRegionsBow->isChecked(),
+                                   descriptors,
+                                   keyPoints);
 
-    std::vector< std::vector< int > > pointIdxsOfClusters;
-    this->bow->compute(descriptors,
-                       descBow,
-                       &pointIdxsOfClusters);
+        if (ui->cBPcaSift->isChecked())
+        {
+            pca.project(descriptors,descriptors);
+            std::cout << "generate project pca-sift from " << fileName << std::endl;
+        }
 
-    img.release();
+        std::vector< std::vector< int > > pointIdxsOfClusters;
+        this->bow->compute(descriptors,
+                           descBow,
+                           &pointIdxsOfClusters);
 
-    std::cout << "generate descriptor bow from " << fileName << std::endl;
+        img.release();
+
+        std::cout << "generate descriptor bow from " << fileName << std::endl;
+    }
 }
 
 //-------------------------------------------------------------------------------------------------------------
@@ -762,7 +748,9 @@ void MWTrackTrace::on_pBGenerateKeyPoints_clicked()
                                              ui->lkpDensity->text().toInt(),
                                              ui->cBRootSift->isChecked(),
                                              ui->cBFilterSift->isChecked(),
-                                             ui->lthresholdFilterSift->text().toFloat());
+                                             ui->lthresholdFilterSift->text().toFloat(),
+                                             ui->cBRegionsBow->isChecked(),
+                                             pca);
     }
     else
     {
@@ -771,7 +759,8 @@ void MWTrackTrace::on_pBGenerateKeyPoints_clicked()
                                           ui->lkpDensity->text().toInt(),
                                           ui->cBRootSift->isChecked(),
                                           ui->cBFilterSift->isChecked(),
-                                          ui->lthresholdFilterSift->text().toFloat());
+                                          ui->lthresholdFilterSift->text().toFloat(),
+                                          ui->cBRegionsBow->isChecked());
     }
 }
 
@@ -826,79 +815,84 @@ void MWTrackTrace::on_pBgenerateDB_clicked()
 void MWTrackTrace::on_pBAll_clicked()
 {
     ui->cBGrayImgs->setChecked(false);
-    ui->cBFilterSift->setChecked(false);
+//    ui->cBFilterSift->setChecked(true);
+//    ui->lthresholdFilterSift->setText("0.65");
     ui->cBRootSift->setChecked(true);
+    ui->cBPcaSift->setChecked(true);
+    ui->cBRegionsBow->setChecked(true);
 
-    ui->lkpSize->setText("20");
-    ui->lkpDensity->setText("3");
-    this->ui->pBGenerateKeyPoints->click();
-    /*
-    ui->ldictionarySize->setText("200");
-    ui->lfilePCA->setText("pca_20_3_rootsift_200");
-    ui->lfileResult->setText("result_20_3_rootsift_200");
-    all();
-
-    ui->ldictionarySize->setText("500");
-    ui->lfilePCA->setText("pca_20_3_rootsift_500");
-    ui->lfileResult->setText("result_20_3_rootsift_500");
-    all();*/
-
-    ui->ldictionarySize->setText("1200");
-    ui->lfilePCA->setText("pca_20_3_rootsift_1200");
-    ui->lfileResult->setText("result_20_3_rootsift_1200");
-    all();
-
-    ui->ldictionarySize->setText("2000");
-    ui->lfilePCA->setText("pca_20_3_rootsift_2000");
-    ui->lfileResult->setText("result_20_3_rootsift_2000");
-    all();
 
     //-------------------------------
-    ui->lkpSize->setText("10");
-    ui->lkpDensity->setText("3");
-    this->ui->pBGenerateKeyPoints->click();
-    ui->ldictionarySize->setText("200");
-    ui->lfilePCA->setText("pca_10_3_rootsift_200");
-    ui->lfileResult->setText("result_10_3_rootsift_200");
-    all();
+//    ui->lkpSize->setText("20");
+//    ui->lkpDensity->setText("3");
+//    this->ui->pBGenerateKeyPoints->click();
+//    ui->ldictionarySize->setText("200");
+//    ui->lfilePCA->setText("pca_20_3_rsift_pca_region_3_200");
+//    ui->lfileResult->setText("result_20_3_rsift_pca_region_3_200");
+//    all();
 
-    ui->ldictionarySize->setText("500");
-    ui->lfilePCA->setText("pca_10_3_rootsift_500");
-    ui->lfileResult->setText("result_10_3_rootsift_500");
-    all();
+//    ui->ldictionarySize->setText("500");
+//    ui->lfilePCA->setText("pca_20_3_rsift_pca_region_3_500");
+//    ui->lfileResult->setText("result_20_3_rsift_pca_region_3_500");
+//    all();
 
-    ui->ldictionarySize->setText("1200");
-    ui->lfilePCA->setText("pca_10_3_rootsift_1200");
-    ui->lfileResult->setText("result_10_3_rootsift_1200");
-    all();
+//    ui->ldictionarySize->setText("1200");
+//    ui->lfilePCA->setText("pca_20_3_rsift_pca_region_3_1200");
+//    ui->lfileResult->setText("result_20_3_rsift_pca_region_3_1200");
+//    all();
 
-    ui->ldictionarySize->setText("2000");
-    ui->lfilePCA->setText("pca_10_3_rootsift_2000");
-    ui->lfileResult->setText("result_10_3_rootsift_2000");
-    all();
+//    ui->ldictionarySize->setText("2000");
+//    ui->lfilePCA->setText("pca_20_3_rsift_pca_region_3_2000");
+//    ui->lfileResult->setText("result_20_3_rsift_pca_region_3_2000");
+//    all();
+
+
+    //-------------------------------
+//    ui->lkpSize->setText("10");
+//    ui->lkpDensity->setText("3");
+//    this->ui->pBGenerateKeyPoints->click();
+//    ui->ldictionarySize->setText("200");
+//    ui->lfilePCA->setText("pca_10_3_rsift_pca_region_200");
+//    ui->lfileResult->setText("result_10_3_rsift_pca_region_200");
+//    all();
+
+//    ui->ldictionarySize->setText("500");
+//    ui->lfilePCA->setText("pca_10_3_rsift_pca_region_500");
+//    ui->lfileResult->setText("result_10_3_rsift_pca_region_500");
+//    all();
+
+//    ui->ldictionarySize->setText("1200");
+//    ui->lfilePCA->setText("pca_10_3_rsift_pca_region_1200");
+//    ui->lfileResult->setText("result_10_3_rsift_pca_region_1200");
+//    all();
+
+//    ui->ldictionarySize->setText("2000");
+//    ui->lfilePCA->setText("pca_10_3_rsift_pca_region_2000");
+//    ui->lfileResult->setText("result_10_3_rsift_pca_region_2000");
+//    all();
 
     //-------------------------------
     ui->lkpSize->setText("5");
     ui->lkpDensity->setText("3");
     this->ui->pBGenerateKeyPoints->click();
     ui->ldictionarySize->setText("200");
-    ui->lfilePCA->setText("pca_5_3_rootsift_200");
-    ui->lfileResult->setText("result_5_3_rootsift_200");
+    ui->lfilePCA->setText("pca_5_3_rsift_pca_region_00");
+    ui->lfileResult->setText("result_5_3_rsift_pca_region_200");
     all();
 
     ui->ldictionarySize->setText("500");
-    ui->lfilePCA->setText("pca_5_3_rootsift_500");
-    ui->lfileResult->setText("result_5_3_rootsift_500");
+    ui->lfilePCA->setText("pca_5_3_rsift_pca_region_00");
+    ui->lfileResult->setText("result_5_3_rsift_pca_region_500");
     all();
 
     ui->ldictionarySize->setText("1200");
-    ui->lfilePCA->setText("pca_5_3_rootsift_1200");
-    ui->lfileResult->setText("result_5_3_rootsift_1200");
+    ui->lfilePCA->setText("pca_5_3_rsift_pca_region_1200");
+    ui->lfileResult->setText("result_5_3_rsift_pca_region_1200");
     all();
 
     ui->ldictionarySize->setText("2000");
-    ui->lfilePCA->setText("pca_5_3_rootsift_2000");
-    ui->lfileResult->setText("result_5_3_rootsift_2000");
+    ui->lfilePCA->setText("pca_5_3_rsift_pca_region_2000");
+    ui->lfileResult->setText("result_5_3_rsift_pca_region_2000");
     all();
 
     //-------------------------------
@@ -906,76 +900,75 @@ void MWTrackTrace::on_pBAll_clicked()
     ui->lkpDensity->setText("3");
     this->ui->pBGenerateKeyPoints->click();
     ui->ldictionarySize->setText("200");
-    ui->lfilePCA->setText("pca_3_3_rootsift_200");
-    ui->lfileResult->setText("result_3_3_rootsift_200");
+    ui->lfilePCA->setText("pca_3_3_rsift_pca_region_200");
+    ui->lfileResult->setText("result_3_3_rsift_pca_region_200");
     all();
 
     ui->ldictionarySize->setText("500");
-    ui->lfilePCA->setText("pca_3_3_rootsift_500");
-    ui->lfileResult->setText("result_3_3_rootsift_500");
+    ui->lfilePCA->setText("pca_3_3_rsift_pca_region_500");
+    ui->lfileResult->setText("result_3_3_rsift_pca_region_500");
     all();
 
     ui->ldictionarySize->setText("1200");
-    ui->lfilePCA->setText("pca_3_3_rootsift_1200");
-    ui->lfileResult->setText("result_3_3_rootsift_1200");
+    ui->lfilePCA->setText("pca_3_3_rsift_pca_region_1200");
+    ui->lfileResult->setText("result_3_3_rsift_pca_region_1200");
     all();
 
     ui->ldictionarySize->setText("2000");
-    ui->lfilePCA->setText("pca_3_3_rootsift_2000");
-    ui->lfileResult->setText("result_3_3_rootsift_2000");
-    all();
-
-
-    //-------------------------------
-    //-------------------------------
-    ui->lkpSize->setText("20");
-    ui->lkpDensity->setText("2");
-    this->ui->pBGenerateKeyPoints->click();
-
-    ui->ldictionarySize->setText("200");
-    ui->lfilePCA->setText("pca_20_2_rootsift_200");
-    ui->lfileResult->setText("result_20_2_rootsift_200");
-    all();
-
-    ui->ldictionarySize->setText("500");
-    ui->lfilePCA->setText("pca_20_2_rootsift_500");
-    ui->lfileResult->setText("result_20_2_rootsift_500");
-    all();
-
-    ui->ldictionarySize->setText("1200");
-    ui->lfilePCA->setText("pca_20_2_rootsift_1200");
-    ui->lfileResult->setText("result_20_2_rootsift_1200");
-    all();
-
-    ui->ldictionarySize->setText("2000");
-    ui->lfilePCA->setText("pca_20_2_rootsift_2000");
-    ui->lfileResult->setText("result_20_2_rootsift_2000");
+    ui->lfilePCA->setText("pca_3_3_rsift_pca_region_2000");
+    ui->lfileResult->setText("result_3_3_rsift_pca_region_2000");
     all();
 
     //-------------------------------
-    ui->lkpSize->setText("10");
-    ui->lkpDensity->setText("2");
-    this->ui->pBGenerateKeyPoints->click();
+    //-------------------------------
+//    ui->lkpSize->setText("20");
+//    ui->lkpDensity->setText("2");
+//    this->ui->pBGenerateKeyPoints->click();
 
-    ui->ldictionarySize->setText("200");
-    ui->lfilePCA->setText("pca_10_2_rootsift_200");
-    ui->lfileResult->setText("result_10_2_rootsift_200");
-    all();
+//    ui->ldictionarySize->setText("200");
+//    ui->lfilePCA->setText("pca_20_2_rsift_pca_region_200");
+//    ui->lfileResult->setText("result_20_2_rsift_pca_region_200");
+//    all();
 
-    ui->ldictionarySize->setText("500");
-    ui->lfilePCA->setText("pca_10_2_rootsift_500");
-    ui->lfileResult->setText("result_10_rootsift_500");
-    all();
+//    ui->ldictionarySize->setText("500");
+//    ui->lfilePCA->setText("pca_20_2_rsift_pca_region_500");
+//    ui->lfileResult->setText("result_20_2_rsift_pca_region_500");
+//    all();
 
-    ui->ldictionarySize->setText("1200");
-    ui->lfilePCA->setText("pca_10_2_rootsift_1200");
-    ui->lfileResult->setText("result_10_2_rootsift_1200");
-    all();
+//    ui->ldictionarySize->setText("1200");
+//    ui->lfilePCA->setText("pca_20_2_rsift_pca_region_1200");
+//    ui->lfileResult->setText("result_20_2_rsift_pca_region_1200");
+//    all();
 
-    ui->ldictionarySize->setText("2000");
-    ui->lfilePCA->setText("pca_10_2_rootsift_2000");
-    ui->lfileResult->setText("result_10_2_rootsift_2000");
-    all();
+//    ui->ldictionarySize->setText("2000");
+//    ui->lfilePCA->setText("pca_20_2_rsift_pca_region_2000");
+//    ui->lfileResult->setText("result_20_2_rsift_pca_region_2000");
+//    all();
+
+    //-------------------------------
+//    ui->lkpSize->setText("10");
+//    ui->lkpDensity->setText("2");
+//    this->ui->pBGenerateKeyPoints->click();
+
+//    ui->ldictionarySize->setText("200");
+//    ui->lfilePCA->setText("pca_10_2_rsift_pca_region_200");
+//    ui->lfileResult->setText("result_10_2_rsift_pca_region_200");
+//    all();
+
+//    ui->ldictionarySize->setText("500");
+//    ui->lfilePCA->setText("pca_10_2_rsift_pca_region_500");
+//    ui->lfileResult->setText("result_10_2_rsift_pca_region_500");
+//    all();
+
+//    ui->ldictionarySize->setText("1200");
+//    ui->lfilePCA->setText("pca_10_2_rsift_pca_region_1200");
+//    ui->lfileResult->setText("result_10_2_rsift_pca_region_1200");
+//    all();
+
+//    ui->ldictionarySize->setText("2000");
+//    ui->lfilePCA->setText("pca_10_2_rsift_pca_region_2000");
+//    ui->lfileResult->setText("result_10_2_rsift_pca_region_2000");
+//    all();
 
     //-------------------------------
     ui->lkpSize->setText("5");
@@ -983,25 +976,25 @@ void MWTrackTrace::on_pBAll_clicked()
     this->ui->pBGenerateKeyPoints->click();
 
     ui->ldictionarySize->setText("200");
-    ui->lfilePCA->setText("pca_5_2_rootsift_200");
-    ui->lfileResult->setText("result_5_2_rootsift_200");
+    ui->lfilePCA->setText("pca_5_2_rsift_pca_region_200");
+    ui->lfileResult->setText("result_5_2_rsift_pca_region_200");
     all();
 
     ui->ldictionarySize->setText("500");
-    ui->lfilePCA->setText("pca_5_2_rootsift_500");
-    ui->lfileResult->setText("result_5_2_rootsift_500");
+    ui->lfilePCA->setText("pca_5_2_rsift_pca_region_500");
+    ui->lfileResult->setText("result_5_2_rsift_pca_region_500");
     all();
 
     ui->ldictionarySize->setText("1200");
-    ui->lfilePCA->setText("pca_5_2_rootsift_1200");
-    ui->lfileResult->setText("result_5_2_rootsift_1200");
+    ui->lfilePCA->setText("pca_5_2_rsift_pca_region_1200");
+    ui->lfileResult->setText("result_5_2_rsift_pca_region_1200");
     all();
 
     ui->lkpSize->setText("5");
     ui->lkpDensity->setText("2");
     ui->ldictionarySize->setText("2000");
-    ui->lfilePCA->setText("pca_5_2_rootsift_2000");
-    ui->lfileResult->setText("result_5_2_rootsift_2000");
+    ui->lfilePCA->setText("pca_5_2_rsift_pca_region_2000");
+    ui->lfileResult->setText("result_5_2_rsift_pca_region_2000");
     all();
 
     //-------------------------------
@@ -1010,23 +1003,23 @@ void MWTrackTrace::on_pBAll_clicked()
     this->ui->pBGenerateKeyPoints->click();
 
     ui->ldictionarySize->setText("200");
-    ui->lfilePCA->setText("pca_3_2_rootsift_200");
-    ui->lfileResult->setText("result_3_2_rootsift_200");
+    ui->lfilePCA->setText("pca_3_2_rsift_pca_region_200");
+    ui->lfileResult->setText("result_3_2_rsift_pca_region_200");
     all();
 
     ui->ldictionarySize->setText("500");
-    ui->lfilePCA->setText("pca_3_2_rootsift_500");
-    ui->lfileResult->setText("result_3_2_rootsift_500");
+    ui->lfilePCA->setText("pca_3_2_rsift_pca_region_500");
+    ui->lfileResult->setText("result_3_2_rsift_pca_region_500");
     all();
 
     ui->ldictionarySize->setText("1200");
-    ui->lfilePCA->setText("pca_3_2_rootsift_1200");
-    ui->lfileResult->setText("result_3_2_rootsift_1200");
+    ui->lfilePCA->setText("pca_3_2_rsift_pca_region_1200");
+    ui->lfileResult->setText("result_3_2_rsift_pca_region_1200");
     all();
 
     ui->ldictionarySize->setText("2000");
-    ui->lfilePCA->setText("pca_3_2_rootsift_2000");
-    ui->lfileResult->setText("result_3_2_rootsift_2000");
+    ui->lfilePCA->setText("pca_3_2_rsift_pca_region_2000");
+    ui->lfileResult->setText("result_3_2_rsift_pca_region_2000");
     all();
 
     /*//Gris
