@@ -7,6 +7,7 @@
 #include <opencv2/ml/ml.hpp>
 
 #include "constants.h"
+#include "util_files.h"
 
 #include <dirent.h>
 #include <sys/stat.h>
@@ -34,6 +35,7 @@ DialogGenerateDB::~DialogGenerateDB()
 void DialogGenerateDB::readPersons(const std::string &idsFileName)
 {
     std::fstream  myfile (idsFileName.c_str(),std::ios_base::in);
+    std::cout << "Reading " << idsFileName.c_str() << " file" << std::endl;
 
     //Leer cabezera
     std::string a;
@@ -51,12 +53,13 @@ void DialogGenerateDB::readPersons(const std::string &idsFileName)
         string namePerson;
         cadena >> namePerson;
 
-        //cout << idPerson << "-" << namePerson <<  std::endl;
+        cout << idPerson << "-" << namePerson <<  std::endl;
 
         categoryPerson[namePerson].push_back(idPerson);
         person[idPerson] = namePerson;
 
     }
+    std::cout << "Reading " << categoryPerson.size() << " category of person" << std::endl;
 }
 
 
@@ -101,6 +104,7 @@ void DialogGenerateDB::readShot(const std::string &videvensFileName)
         //std::cout << initFrame << "-" << initTime << "-" << shotType << "-" << endFrame << "-" << endTime << std::endl;
     }
     myfile.close();
+    std::cout << "Reading " << shots.size() << " shots" << std::endl;
 }
 
 
@@ -173,8 +177,10 @@ void DialogGenerateDB::readTracks(const std::string &idsFileName,
                               const std::string &facetrackFileName)
 {
     readShot(videvenstsFileName);
+    std::cout << "Read shots" << std::endl;
 
     readPersons(idsFileName);
+    std::cout << "Read person" << std::endl;
 
     std::fstream  myfile (facetrackFileName.c_str(),std::ios_base::in);
 
@@ -189,6 +195,8 @@ void DialogGenerateDB::readTracks(const std::string &idsFileName,
     while (std::getline(myfile, a)) {
         std::stringstream cadena;
         cadena.str(a);
+
+        std::cout << cadena.str().c_str() << std::endl;
 
         int numFrame;
         cadena >> numFrame;
@@ -215,6 +223,8 @@ void DialogGenerateDB::readTracks(const std::string &idsFileName,
                 track->rect = cv::Rect(x,y,h,w);
                 track->type = person[p];
 
+                std::cout << track->type  << std::endl;
+
                 tracks.push_back(track);
 
                 //lectura datos ley rey
@@ -225,9 +235,11 @@ void DialogGenerateDB::readTracks(const std::string &idsFileName,
                 cadena >> reyey;
             }
         }
+        std::cout << "Read " << tracks.size() << " tracks for frame" << std::endl;
         tracksFrames.push_back(tracks);
     }
     myfile.close();
+    std::cout << "Read " << tracksFrames.size() << " tracksFrames" << std::endl;
 }
 
 //-------------------------------------------------------------------------------------------------------------
@@ -241,9 +253,9 @@ void DialogGenerateDB::saveTracks(std::map <std::string, std::vector<cv::Mat> > 
         std::vector<cv::Mat> faces = (*itPersons).second;
         std::string personName = (*itPersons).first;
 
+        //Se crea el dir destino
         std::stringstream dirImages;
         dirImages << ui->dirImgGenerate->text().toStdString();
-
         DIR* dir = opendir(dirImages.str().c_str());
         if (dir)
             closedir(dir);
@@ -251,6 +263,7 @@ void DialogGenerateDB::saveTracks(std::map <std::string, std::vector<cv::Mat> > 
             mkdir(dirImages.str().c_str(),S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
 
+        //Si se quiere separar las imagenes de cada persona en un directorio
         if (ui->cBSeparateImgs->isChecked())
         {
             dirImages << "/" << personName;
@@ -259,6 +272,16 @@ void DialogGenerateDB::saveTracks(std::map <std::string, std::vector<cv::Mat> > 
                 closedir(dir);
             else
                 mkdir(dirImages.str().c_str(),S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        }
+        else if (ui->cBSeparateImgsTrack->isChecked()) //Si se desean todos las imgs de un personaje el en shot
+        {
+            dirImages << "/" << personName << "_Shot_" << numTrack;
+            dir = opendir(dirImages.str().c_str());
+            if (dir)
+                closedir(dir);
+            else
+                mkdir(dirImages.str().c_str(),S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+
         }
         dirImages << "/";
 
@@ -319,8 +342,11 @@ void DialogGenerateDB::on_pBGenerateImages_clicked()
     std::stringstream fileNameFaceTrack;
     fileNameFaceTrack << onlyFileNameVideo << "." << Constants::FACE_TRACK_FILE_EXT;
 
-    readTracks(fileNameEvents.str(),
-               fileNameIDs.str(),
+    std::cout << "read " << fileNameEvents.str().c_str() << std::endl;
+    std::cout << "read " << fileNameIDs.str().c_str() << std::endl;
+    std::cout << "read " << fileNameFaceTrack.str().c_str() << std::endl;
+    readTracks(fileNameIDs.str(),
+               fileNameEvents.str(),
                fileNameFaceTrack.str());
 
     //Si no queremos que se genere determiandas caras (no cara o desconodios por ejemplo)
@@ -355,11 +381,13 @@ void DialogGenerateDB::on_pBGenerateImages_clicked()
 
         if (tracksFrames.size() > numFrame-desfase)
         {
+            //Cada una de las caras del track
             int numTrack = tracksFrames[numFrame-desfase].size();
             for (int i=0; i<numTrack; i++)
             {
                 //Si el id de la cara no es ninguno de los que nos interesan no recortamos esa region ni la presentamos
                 std::string person = tracksFrames[numFrame-desfase][i]->type;
+                std::cout << person << std::endl;
                 if (std::find(filterIds.begin(),filterIds.end(),person) == filterIds.end())
                     continue;
 
@@ -418,6 +446,8 @@ void DialogGenerateDB::on_pBGenerateImages_clicked()
             }
         }
 
+
+        //Cada vez que termina un shot se graban todas las caras de este shot
         if (numFrame-desfase == shot->initFrame)
         {
             numShot++;
@@ -442,4 +472,79 @@ void DialogGenerateDB::on_pBGenerateImages_clicked()
     }
 
     vid.release();
+}
+
+
+//-------------------------------------------------------------------------------------------------------------
+void DialogGenerateDB::changeBrightnessAndContrast(const cv::Mat &matScr,
+                                                   cv::Mat &matDes,
+                                                   double alpha,
+                                                   int beta)
+{
+    /// Do the operation new_image(i,j) = alpha*image(i,j) + beta
+    for( int y = 0; y < matScr.rows; y++ )
+    {
+        for( int x = 0; x < matScr.cols; x++ )
+        {
+            for( int c = 0; c < 3; c++ )
+            {
+                matDes.at<cv::Vec3b>(y,x)[c] = cv::saturate_cast<uchar>(alpha*( matScr.at<cv::Vec3b>(y,x)[c] ) + beta);
+            }
+        }
+    }
+}
+
+//-------------------------------------------------------------------------------------------------------------
+void DialogGenerateDB::move(const cv::Mat &matScr,
+                            cv::Mat &matDes)
+{
+    int border = 10;
+    copyMakeBorder( matScr, matDes, border, border, border, border, cv::BORDER_CONSTANT, cv::Scalar(0,0,0));
+
+    int x = rand() % (int)(20 + 1);
+    int y = rand() % (int)(20 + 1);
+    matDes = matDes(cv::Rect(x,y,100,100));
+}
+
+//-------------------------------------------------------------------------------------------------------------
+void DialogGenerateDB::on_pBGenerateModifiedImages_clicked()
+{
+    std::vector <std::string> filesForModifed;
+    UTIL_Files::filesDir(this->ui->ldirImgsForModified->text().toStdString(),
+                         Constants::IMAGE_EXT,
+                         filesForModifed);
+
+    std::vector <std::string>::iterator it_filesForModified = filesForModifed.begin();
+    for (; it_filesForModified!=filesForModifed.end(); it_filesForModified++)
+    {
+        string completeFileName = (*it_filesForModified);
+
+        cv::Mat img = cv::imread(completeFileName);
+
+//        cv::imshow("antes",img);
+
+        cv::Mat imgModified;
+        if (ui->cBModifiedBC->isChecked())
+        {
+            double alpha  = (100 + (rand() % (int)(210 - 100 + 1)))/100.0;//double alpha = std::experimental::randint(190, 210)/100.0; //alpha value [1.0-3.0]
+            int beta  = 0 + (rand() % (int)(100 - 0 + 1));//int beta = std:: experimental::randint(40, 60);  //beta value [0-100]
+            this->changeBrightnessAndContrast(img,imgModified,alpha,beta);
+        }
+        else if (ui->cBModifiedMove->isChecked())
+        {
+            this->move(img,imgModified);
+        }
+
+//        cv::imshow("despues",imgModified);
+//        cv::waitKey();
+
+        std::string dirModified = this->ui->ldirImgsModified->text().toStdString();
+        std::stringstream sfileName;
+        sfileName << dirModified << "/" <<UTIL_Files::fileName(completeFileName);
+
+        std::cout << sfileName.str().c_str() << std::endl;
+        UTIL_Files::createDir(dirModified);
+        cv::imwrite(sfileName.str().c_str(),imgModified);
+    }
+
 }

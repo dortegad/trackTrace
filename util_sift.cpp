@@ -115,7 +115,8 @@ void UTIL_Sift::computeAndDetectSift(const cv::Mat &img,
         scores.push_back(score);
     }
 
-//    cv::normalize(scores,scores,0,1);
+    cv::normalize(scores,scores,0,1);
+    std::cout << "normalize scores sift descriptors" << std::endl;
 }
 
 //-------------------------------------------------------------------------------------------------------------
@@ -133,7 +134,8 @@ void UTIL_Sift::scoresDescriptorsSift(cv::Mat &descriptors,
     std::cout << "generate scores sift descriptors" << std::endl;
 
 
-//    cv::normalize(scores,scores,0,1,cv::NORM_MINMAX);
+    cv::normalize(scores,scores,0,1,cv::NORM_MINMAX);
+    std::cout << "normalize scores sift descriptors" << std::endl;
 }
 
 //-------------------------------------------------------------------------------------------------------------
@@ -283,17 +285,17 @@ void UTIL_Sift::descriptorsSift(const cv::Mat &img,
                                 thresholdFilter,
                                 descriptors,
                                 keyPoints);
-//        cv::Mat descriptors_2;
-//        UTIL_Sift::sifts(img,
-//                         keyPointSize,
-//                         density,
-//                         rSift,
-//                         filterDescriptors,
-//                         thresholdFilter,
-//                         descriptors_2,
-//                         keyPoints);
+        cv::Mat descriptors_2;
+        UTIL_Sift::sifts(img,
+                         keyPointSize,
+                         density,
+                         rSift,
+                         filterDescriptors,
+                         thresholdFilter,
+                         descriptors_2,
+                         keyPoints);
 
-//        cv::vconcat(descriptors,descriptors_2,descriptors);
+        cv::vconcat(descriptors,descriptors_2,descriptors);
     }
     else
     {

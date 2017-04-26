@@ -7,6 +7,7 @@
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/xfeatures2d/nonfree.hpp>
+#include <opencv2/ml/ml.hpp>
 
 
 namespace Ui {
@@ -42,6 +43,9 @@ private slots:
     void on_pBAutoDetectSift_clicked();
 
     void on_pBgenerateDB_clicked();
+
+    void on_pBTestSVMTrack_clicked();
+
 
 private:
     Ui::MWTrackTrace *ui;
@@ -90,18 +94,20 @@ public :
                               cv::Mat &dataMat);
     void generateSVM();
 
+    void cropImage(cv::Mat &img,
+                  std::vector<cv::Mat> &subImgs);
     void descriptorBow(const std::string &fileName,
                        cv::Mat &descBow);
 
     void descriptorGray(const std::string &fileName,
                         cv::Mat &descGray);
+    void descriptor(const std::string &fileName,
+                    cv::Mat &desc);
 
+    //Test
+    void readTrainData(cv::Ptr<cv::ml::SVM> &svm,
+                       std::map < std::string, int> &relationsLabel);
     void all();
-
-    void filesDir(const std::string &dirName, const std::string &extension, std::vector<std::string> &files);
-    void filesFilter(std::vector<std::string> &files, std::vector<std::string> &filtersLabel);
-    void readRelationsLabels(const std::string &fileRelationsLabels, std::map<std::string, int> &relationsLabels);
-    void readLabels(const std::string &fileLabels, std::vector<std::string> &labels);
 };
 
 #endif // MWTRACKTRACE_H

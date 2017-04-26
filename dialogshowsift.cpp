@@ -57,13 +57,13 @@ void DialogShowSift::generateSift()
         float score = scores[i];
         float umbral = ui->lEThresholdSift->text().toFloat();
         std::cout << score << " " << umbral << std::endl;
-        if (score > umbral)
-        {
+       // if (score > umbral)
+       // {
             cv::KeyPoint kp = keyPoints[i];
             cv::Point2f p = kp.pt;
             cv::Rect rect(p.x,p.y,1,1);
             cv::rectangle(imgAux,rect,cv::Scalar(0,0,255),-1,1);
-        }
+       // }
     }
     showImage(imgAux);
 }
@@ -107,12 +107,18 @@ void DialogShowSift::showSiftActualFile()
         UTIL_Sift::computeSift(img,this->keyPoints,descriptors);
 
         UTIL_Sift::scoresDescriptorsSift(descriptors,this->scores);
+
     }
+
+    cv::Mat imgclone = img.clone();
+    cv::drawKeypoints(imgclone, this->keyPoints,imgclone,cv::Scalar::all(-1),4);
+    cv::imshow("prueba",imgclone);
 
     float max = *(std::max_element(this->scores.begin(),this->scores.end()));
     min = *(std::min_element(this->scores.begin(),this->scores.end()));
     float dif = max - min;
     paso = dif / 100;
+
 
     cv::cvtColor(img,this->imgSift,CV_GRAY2BGR);
 

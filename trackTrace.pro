@@ -18,7 +18,8 @@ SOURCES += main.cpp\
     util_sift.cpp \
     dialoggeneratedb.cpp \
     util_bow.cpp \
-    constants.cpp
+    constants.cpp \
+    util_files.cpp
 
 HEADERS  += mwtracktrace.h \
     dialogshowbow.h \
@@ -26,7 +27,8 @@ HEADERS  += mwtracktrace.h \
     util_sift.h \
     dialoggeneratedb.h \
     util_bow.h \
-    constants.h
+    constants.h \
+    util_files.h
 
 FORMS    += mwtracktrace.ui \
     dialogshowbow.ui \

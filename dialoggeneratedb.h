@@ -55,8 +55,14 @@ public:
     void viewTracks(std::map<std::string, std::vector<cv::Mat> > &facesTrack);
 
     void readFiltersId(const std::string &fileNameFilterIds, std::vector<std::string> &filterIds);
+
+    void changeBrightnessAndContrast(const cv::Mat &matScr, cv::Mat &matDes, double alpha, int beta);
+
+    void move(const cv::Mat &matScr, cv::Mat &matDes);
 private slots:
     void on_pBGenerateImages_clicked();
+
+    void on_pBGenerateModifiedImages_clicked();
 
 private:
     Ui::DialogGenerateDB *ui;

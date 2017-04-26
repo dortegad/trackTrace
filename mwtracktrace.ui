@@ -294,7 +294,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>687</y>
+      <y>636</y>
       <width>711</width>
       <height>30</height>
      </rect>
@@ -307,7 +307,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>642</y>
+      <y>591</y>
       <width>711</width>
       <height>30</height>
      </rect>
@@ -320,7 +320,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>669</y>
+      <y>618</y>
       <width>141</width>
       <height>20</height>
      </rect>
@@ -333,7 +333,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>624</y>
+      <y>573</y>
       <width>141</width>
       <height>20</height>
      </rect>
@@ -346,39 +346,13 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>773</y>
+      <y>722</y>
       <width>211</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
      <string>text SVM</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lDiccionaryFile_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>598</y>
-      <width>711</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>faces_keypoints/dictionary.dic</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_7">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>580</y>
-      <width>111</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>dictionary file</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="cBGenerateBowSamples">
@@ -443,7 +417,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>715</y>
+      <y>664</y>
       <width>141</width>
       <height>20</height>
      </rect>
@@ -456,7 +430,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>733</y>
+      <y>682</y>
       <width>711</width>
       <height>30</height>
      </rect>
@@ -702,6 +676,19 @@
     </property>
     <property name="text">
      <string>labels to dicc</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pBTestSVMTrack">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>750</y>
+      <width>211</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>text SVM Track</string>
     </property>
    </widget>
   </widget>
